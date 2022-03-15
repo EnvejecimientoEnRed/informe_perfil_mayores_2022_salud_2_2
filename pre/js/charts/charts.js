@@ -23,9 +23,11 @@ export function initChart(iframe) {
     //Lectura de datos
     d3.csv('https://raw.githubusercontent.com/CarlosMunozDiazCSIC/informe_perfil_mayores_2022_salud_2_2/main/data/edv65_1908_2020.csv', function(error,data) {
         if (error) throw error;
-
+        
         //Desarrollo del gráfico
-        let margin = {top: 10, right: 30, bottom: 30, left: 60},
+        let paths;
+
+        let margin = {top: 10, right: 10, bottom: 30, left: 30},
             width = document.getElementById('chart').clientWidth - margin.left - margin.right,
             height = document.getElementById('chart').clientHeight - margin.top - margin.bottom;
 
@@ -58,6 +60,7 @@ export function initChart(iframe) {
         function init() {
             svg.append("path")
                 .datum(data)
+                .attr('class', 'prueba')
                 .attr("fill", "none")
                 .attr("stroke", COLOR_PRIMARY_1)
                 .attr("stroke-width", 1.5)
@@ -68,6 +71,7 @@ export function initChart(iframe) {
         
             svg.append("path")
                 .datum(data)
+                .attr('class', 'prueba')
                 .attr("fill", "none")
                 .attr("stroke", COLOR_COMP_1)
                 .attr("stroke-width", 1.5)
@@ -75,10 +79,24 @@ export function initChart(iframe) {
                 .x(function(d) { return x(d.Year) })
                 .y(function(d) { return y(+d.Female) })
                 )
+
+            paths = svg.selectAll('.prueba');
+
+            paths.attr("stroke-dasharray", 968 + " " + 968)
+                .attr("stroke-dashoffset", 968)
+                .transition()
+                .ease(d3.easeLinear)
+                .attr("stroke-dashoffset", 0)
+                .duration(3000);
         }
 
         function animateChart() {
-
+            paths.attr("stroke-dasharray", 968 + " " + 968)
+                .attr("stroke-dashoffset", 968)
+                .transition()
+                .ease(d3.easeLinear)
+                .attr("stroke-dashoffset", 0)
+                .duration(3000);
         }
 
         //////
