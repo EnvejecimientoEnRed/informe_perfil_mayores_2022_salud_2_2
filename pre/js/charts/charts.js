@@ -12,7 +12,7 @@ const COLOR_PRIMARY_1 = '#F8B05C',
 COLOR_COMP_1 = '#528FAD';
 let tooltip = d3.select('#tooltip');
 
-export function initChart(iframe) {
+export function initChart() {
     //Lectura de datos
     d3.csv('https://raw.githubusercontent.com/CarlosMunozDiazCSIC/informe_perfil_mayores_2022_salud_2_2/main/data/edv65_1908_2020.csv', function(error,data) {
         if (error) throw error;
@@ -72,153 +72,152 @@ export function initChart(iframe) {
             .attr("class", "yaxis")
             .call(yAxis);
 
-            function init() {
-                //Hombres
-                svg.append("path")
-                    .datum(data)
-                    .attr('class', 'rect')
-                    .attr("fill", "none")
-                    .attr("stroke", COLOR_PRIMARY_1)
-                    .attr("stroke-width", 1.5)
-                    .attr("d", d3.line()
-                        .x(function(d) { return x(d.Year) })
-                        .y(function(d) { return y(+d.Male) })
-                    )
-                
-                //Mujeres
-                svg.append("path")
-                    .datum(data)
-                    .attr('class', 'rect')
-                    .attr("fill", "none")
-                    .attr("stroke", COLOR_COMP_1)
-                    .attr("stroke-width", 1.5)
-                    .attr("d", d3.line()
-                        .x(function(d) { return x(d.Year) })
-                        .y(function(d) { return y(+d.Female) })
-                    )
-    
-                paths = svg.selectAll('.rect');
-    
-                paths.attr("stroke-dasharray", 1000 + " " + 1000)
-                    .attr("stroke-dashoffset", 1000)
-                    .transition()
-                    .ease(d3.easeLinear)
-                    .attr("stroke-dashoffset", 0)
-                    .duration(2000);
-    
-                //Círculos para tooltip
-                svg.selectAll('circles_male')
-                    .data(data)
-                    .enter()
-                    .append('circle')
-                    .attr('class', function(d) {
-                        return 'circle ' + d.Year;
-                    })
-                    .attr('cx', function(d) {
-                        return x(d.Year);
-                    })
-                    .attr('cy', function(d) {
-                        return y(+d.Male);
-                    })
-                    .attr('r', 3)
-                    .attr('stroke', 'none')
-                    .attr('fill', 'transparent')
-                    .on('mouseover', function(d,i,e) {
-                        //Opacidad en círculos
-                        let css = e[i].getAttribute('class').split(' ')[1];
-                        let circles = svg.selectAll('.circle');                    
-                
-                        circles.each(function() {
-                            //this.style.stroke = '0.4';
-                            let split = this.getAttribute('class').split(" ")[1];
-                            if(split == `${css}`) {
-                                this.style.stroke = 'black';
-                                this.style.strokeWidth = '1';
-                            }
-                        });
-    
-                        //Texto
-                        let html = '<p class="chart__tooltip--title">' + d.Year + '</p>' + 
-                            '<p class="chart__tooltip--text">La esperanza de vida a los 65 años para las mujeres es de <b>' + numberWithCommas3(parseFloat(d.Female)) + '</b> años; para los hombres, de <b>' + numberWithCommas3(parseFloat(d.Male)) + '</b> años</p>';
-                    
-                        tooltip.html(html);
-    
-                        //Tooltip
-                        positionTooltip(window.event, tooltip);
-                        getInTooltip(tooltip);
-                    })
-                    .on('mouseout', function(d,i,e) {
-                        //Quitamos los estilos de la línea
-                        let circles = svg.selectAll('.circle');
-                        circles.each(function() {
-                            this.style.stroke = 'none';
-                        });
-                    
-                        //Quitamos el tooltip
-                        getOutTooltip(tooltip); 
+        function init() {
+            //Hombres
+            svg.append("path")
+                .datum(data)
+                .attr('class', 'rect')
+                .attr("fill", "none")
+                .attr("stroke", COLOR_PRIMARY_1)
+                .attr("stroke-width", 1.5)
+                .attr("d", d3.line()
+                    .x(function(d) { return x(d.Year) })
+                    .y(function(d) { return y(+d.Male) })
+                )
+            
+            //Mujeres
+            svg.append("path")
+                .datum(data)
+                .attr('class', 'rect')
+                .attr("fill", "none")
+                .attr("stroke", COLOR_COMP_1)
+                .attr("stroke-width", 1.5)
+                .attr("d", d3.line()
+                    .x(function(d) { return x(d.Year) })
+                    .y(function(d) { return y(+d.Female) })
+                )
+
+            paths = svg.selectAll('.rect');
+
+            paths.attr("stroke-dasharray", 1000 + " " + 1000)
+                .attr("stroke-dashoffset", 1000)
+                .transition()
+                .ease(d3.easeLinear)
+                .attr("stroke-dashoffset", 0)
+                .duration(2000);
+
+            //Círculos para tooltip
+            svg.selectAll('circles_male')
+                .data(data)
+                .enter()
+                .append('circle')
+                .attr('class', function(d) {
+                    return 'circle ' + d.Year;
+                })
+                .attr('cx', function(d) {
+                    return x(d.Year);
+                })
+                .attr('cy', function(d) {
+                    return y(+d.Male);
+                })
+                .attr('r', 3)
+                .attr('stroke', 'none')
+                .attr('fill', 'transparent')
+                .on('mouseover', function(d,i,e) {
+                    //Opacidad en círculos
+                    let css = e[i].getAttribute('class').split(' ')[1];
+                    let circles = svg.selectAll('.circle');                    
+            
+                    circles.each(function() {
+                        //this.style.stroke = '0.4';
+                        let split = this.getAttribute('class').split(" ")[1];
+                        if(split == `${css}`) {
+                            this.style.stroke = 'black';
+                            this.style.strokeWidth = '1';
+                        }
                     });
-    
-                svg.selectAll('circles_female')
-                    .data(data)
-                    .enter()
-                    .append('circle')
-                    .attr('class', function(d) {
-                        return 'circle ' + d.Year;
-                    })
-                    .attr('cx', function(d) {
-                        return x(d.Year);
-                    })
-                    .attr('cy', function(d) {
-                        return y(+d.Female);
-                    })
-                    .attr('r', 3)
-                    .attr('stroke', 'none')
-                    .attr('fill', 'transparent')
-                    .on('mouseover', function(d,i,e) {
-                        //Opacidad en círculos
-                        let css = e[i].getAttribute('class').split(' ')[1];
-                        let circles = svg.selectAll('.circle');                    
+
+                    //Texto
+                    let html = '<p class="chart__tooltip--title">' + d.Year + '</p>' + 
+                        '<p class="chart__tooltip--text">La esperanza de vida a los 65 años para las mujeres es de <b>' + numberWithCommas3(parseFloat(d.Female)) + '</b> años; para los hombres, de <b>' + numberWithCommas3(parseFloat(d.Male)) + '</b> años</p>';
                 
-                        circles.each(function() {
-                            //this.style.stroke = '0.4';
-                            let split = this.getAttribute('class').split(" ")[1];
-                            if(split == `${css}`) {
-                                this.style.stroke = 'black';
-                                this.style.strokeWidth = '1';
-                            }
-                        });
-    
-                        //Texto
-                        let html = '<p class="chart__tooltip--title">' + d.Year + '</p>' + 
-                            '<p class="chart__tooltip--text">La esperanza de vida a los 65 años para las mujeres es de <b>' + numberWithCommas3(parseFloat(d.Female)) + '</b> años; para los hombres, de <b>' + numberWithCommas3(parseFloat(d.Male)) + '</b> años</p>';
-                    
-                        tooltip.html(html);
-    
-                        //Tooltip
-                        positionTooltip(window.event, tooltip);
-                        getInTooltip(tooltip);
-                    })
-                    .on('mouseout', function(d,i,e) {
-                        //Quitamos los estilos de la línea
-                        let circles = svg.selectAll('.circle');
-                        circles.each(function() {
-                            this.style.stroke = 'none';
-                        });
-                    
-                        //Quitamos el tooltip
-                        getOutTooltip(tooltip); 
+                    tooltip.html(html);
+
+                    //Tooltip
+                    positionTooltip(window.event, tooltip);
+                    getInTooltip(tooltip);
+                })
+                .on('mouseout', function(d,i,e) {
+                    //Quitamos los estilos de la línea
+                    let circles = svg.selectAll('.circle');
+                    circles.each(function() {
+                        this.style.stroke = 'none';
                     });
-    
-            }
-    
-            function animateChart() {
-                paths.attr("stroke-dasharray", 1000 + " " + 1000)
-                    .attr("stroke-dashoffset", 1000)
-                    .transition()
-                    .ease(d3.easeLinear)
-                    .attr("stroke-dashoffset", 0)
-                    .duration(2000);
-            }
+                
+                    //Quitamos el tooltip
+                    getOutTooltip(tooltip); 
+                });
+
+            svg.selectAll('circles_female')
+                .data(data)
+                .enter()
+                .append('circle')
+                .attr('class', function(d) {
+                    return 'circle ' + d.Year;
+                })
+                .attr('cx', function(d) {
+                    return x(d.Year);
+                })
+                .attr('cy', function(d) {
+                    return y(+d.Female);
+                })
+                .attr('r', 3)
+                .attr('stroke', 'none')
+                .attr('fill', 'transparent')
+                .on('mouseover', function(d,i,e) {
+                    //Opacidad en círculos
+                    let css = e[i].getAttribute('class').split(' ')[1];
+                    let circles = svg.selectAll('.circle');                    
+            
+                    circles.each(function() {
+                        //this.style.stroke = '0.4';
+                        let split = this.getAttribute('class').split(" ")[1];
+                        if(split == `${css}`) {
+                            this.style.stroke = 'black';
+                            this.style.strokeWidth = '1';
+                        }
+                    });
+
+                    //Texto
+                    let html = '<p class="chart__tooltip--title">' + d.Year + '</p>' + 
+                        '<p class="chart__tooltip--text">La esperanza de vida a los 65 años para las mujeres es de <b>' + numberWithCommas3(parseFloat(d.Female)) + '</b> años; para los hombres, de <b>' + numberWithCommas3(parseFloat(d.Male)) + '</b> años</p>';
+                
+                    tooltip.html(html);
+
+                    //Tooltip
+                    positionTooltip(window.event, tooltip);
+                    getInTooltip(tooltip);
+                })
+                .on('mouseout', function(d,i,e) {
+                    //Quitamos los estilos de la línea
+                    let circles = svg.selectAll('.circle');
+                    circles.each(function() {
+                        this.style.stroke = 'none';
+                    });
+                
+                    //Quitamos el tooltip
+                    getOutTooltip(tooltip); 
+                });    
+        }
+
+        function animateChart() {
+            paths.attr("stroke-dasharray", 1000 + " " + 1000)
+                .attr("stroke-dashoffset", 1000)
+                .transition()
+                .ease(d3.easeLinear)
+                .attr("stroke-dashoffset", 0)
+                .duration(2000);
+        }
 
         //////
         ///// Resto - Chart
@@ -228,6 +227,10 @@ export function initChart(iframe) {
         //Animación del gráfico
         document.getElementById('replay').addEventListener('click', function() {
             animateChart();
+
+            setTimeout(() => {
+                setChartCanvas();
+            }, 4000);
         });
 
         //////
@@ -241,7 +244,9 @@ export function initChart(iframe) {
         setRRSSLinks('evolucion_esperanza_vida_65');
 
         //Captura de pantalla de la visualización
-        setChartCanvas();
+        setTimeout(() => {
+            setChartCanvas();
+        }, 4000);
 
         let pngDownload = document.getElementById('pngImage');
 
@@ -250,7 +255,7 @@ export function initChart(iframe) {
         });
 
         //Altura del frame
-        setChartHeight(iframe);
+        setChartHeight();
     });
 }
 
